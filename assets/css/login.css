@@ -1,0 +1,193 @@
+:root {
+    --bg1: #0b0d12;
+    --bg2: #111827;
+    --card: #ffffff;
+    --text: #111827;
+    --muted: #6b7280;
+    --border: #e5e7eb;
+    --ring: rgba(17, 24, 39, .12);
+    --primary: #111827;
+    --primary-contrast: #fff;
+    --success: #065f46;
+    --success-contrast: #fff;
+    --error: #b91c1c;
+    --error-bg: #fee2e2;
+    --error-br: #fecaca;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --card: #0f1420;
+        --text: #e5e7eb;
+        --muted: #9ca3af;
+        --border: #1f2937;
+        --primary: #e5e7eb;
+        --primary-contrast: #0b0d12;
+        --success: #10b981;
+        --success-contrast: #0b0d12;
+        --ring: rgba(255, 255, 255, .12);
+        --error-bg: #3b0c0c;
+        --error-br: #7f1d1d;
+    }
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, "Helvetica Neue", sans-serif;
+    background: linear-gradient(120deg, var(--bg1), var(--bg2));
+}
+
+.wm-wrap {
+    min-height: 100svh;
+    display: grid;
+    place-items: center;
+    padding: 24px;
+}
+
+#login_container {
+    display: block;
+}
+
+/* preserve original display contract */
+
+.wm-card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--card);
+    color: var(--text);
+    border-radius: 20px;
+    padding: 26px 22px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .28);
+}
+
+.wm-header {
+    text-align: center;
+    margin-bottom: 14px
+}
+
+.wm-logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 10px;
+    display: grid;
+    place-items: center;
+    border-radius: 16px;
+    background: rgba(127, 127, 127, .08);
+    font-size: 24px;
+}
+
+.wm-app {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: .2px
+}
+
+.wm-title {
+    margin: 6px 0 0;
+    font-size: 18px;
+    font-weight: 700
+}
+
+.wm-sub {
+    margin: 6px 0 0;
+    font-size: 13px;
+    color: var(--muted)
+}
+
+.wm-error {
+    margin: 12px 0;
+    font-size: 14px;
+    color: var(--error);
+    background: var(--error-bg);
+    border: 1px solid var(--error-br);
+    padding: 10px 12px;
+    border-radius: 12px;
+}
+
+.wm-label {
+    display: block;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin: 10px 0 6px;
+    font-weight: 700;
+}
+
+.wm-input {
+  width: 100%;
+  padding: 12px 13px;
+  border-radius: 14px;
+  font-size: 15px;
+  border: 2px solid var(--border);     /* thicker border always visible */
+  background: transparent;
+  color: var(--text);
+  outline: 2px solid var(--border);    /* keep a browser outline always */
+  outline-offset: 2px;                 /* separate outline from border */
+  transition: border-color .15s ease, outline-color .15s ease, box-shadow .15s ease;
+}
+
+.wm-input:focus {
+  border-color: var(--primary);        /* highlight border on focus */
+  outline-color: var(--primary);       /* also color the outline */
+  box-shadow: 0 0 0 5px var(--ring);
+}
+.wm-otp {
+    letter-spacing: .35em;
+    text-align: center;
+    font-weight: 700
+}
+
+.wm-btn {
+    width: 100%;
+    margin-top: 14px;
+    padding: 12px 14px;
+    border-radius: 14px;
+    font-weight: 700;
+    border: 1px solid var(--border);
+    background: #f3f4f6;
+    color: var(--text);
+    cursor: pointer;
+    transition: transform .05s ease, filter .2s, background .2s, border-color .2s;
+}
+
+.wm-btn:active {
+    transform: translateY(1px)
+}
+
+.wm-btn[disabled] {
+    opacity: .6;
+    cursor: not-allowed
+}
+
+.wm-btn-primary {
+    background: var(--primary);
+    color: var(--primary-contrast);
+    border-color: var(--primary)
+}
+
+.wm-btn-success {
+    background: var(--success);
+    color: var(--success-contrast);
+    border-color: var(--success)
+}
+
+.wm-otp-block {
+    margin-top: 8px
+}
+
+.wm-foot {
+    margin-top: 18px;
+    text-align: center;
+    color: var(--muted)
+}
