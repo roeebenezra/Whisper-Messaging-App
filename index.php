@@ -13,33 +13,49 @@
 
 	<link rel="stylesheet" href="./assets/css/main.css?v=<?php echo time(); ?>" />
 	<link rel="stylesheet" href="./assets/css/mobile.css?v=<?php echo time(); ?>" />
+	<link rel="stylesheet" href="./assets/css/login.css?v=<?php echo time(); ?>" />
 
 	<title>Whisper Messaging App</title>
 </head>
 
 <body>
 	<!-- Login container -->
-	<div id="login_container" style="max-width:420px;margin:8vh auto;display:block;">
-		<form id="login_form" autocomplete="off" class="card p-4 shadow">
-			<h2 class="mb-3 text-center">Sign in</h2>
-			<input type="text" id="login_username" name="username" class="form-control mb-3" placeholder="username"
-				required />
+	<div id="login_container" class="wm-wrap">
+		<form id="login_form" autocomplete="off" class="wm-card">
+			<div class="wm-header">
+				<div class="wm-logo" aria-hidden="true">💬</div>
+				<h1 class="wm-app">Whisper Messaging App</h1>
+				<h2 class="wm-title">Sign in</h2>
+				<p class="wm-sub">Secure one-time code login</p>
+			</div>
 
-			<!-- Honeypot -->
+			<!-- Inline error (optional) -->
+			<div id="wm-error" class="wm-error" style="display:none;"></div>
+
+			<label class="wm-label" for="login_username">Username</label>
+			<input type="text" id="login_username" name="username" class="wm-input" placeholder="Enter your username"
+				required autocomplete="username" />
+
+			<!-- Honeypot (unchanged) -->
 			<div style="position:absolute;left:-9999px;top:auto;width:1px;height:1px;overflow:hidden;">
 				<label>Website</label>
 				<input type="text" id="website" name="website" value="" />
 			</div>
 
-			<div class="d-grid gap-2">
-				<button type="button" id="btn_send_otp" class="btn btn-dark">Send OTP</button>
+			<button type="button" id="btn_send_otp" class="wm-btn wm-btn-primary">Send OTP</button>
+
+			<div class="wm-otp-block" id="login_otp_group" style="display:none;">
+				<label class="wm-label" for="login_otp">One-time code</label>
+				<input type="text" id="login_otp" name="otp" class="wm-input wm-otp" placeholder="••••••" maxlength="6"
+					inputmode="numeric" autocomplete="one-time-code" />
 			</div>
 
-			<input type="text" id="login_otp" name="otp" class="form-control mt-3" placeholder="6-digit code"
-				maxlength="6" style="display:none;" />
-			<div class="d-grid gap-2 mt-2">
-				<button type="button" id="btn_verify_otp" class="btn btn-success" style="display:none;">Verify & Sign
-					in</button>
+			<button type="button" id="btn_verify_otp" class="wm-btn wm-btn-success" style="display:none;">
+				Verify &amp; Sign in
+			</button>
+
+			<div class="wm-foot">
+				<small>Protected login • OTP required</small>
 			</div>
 		</form>
 	</div>
