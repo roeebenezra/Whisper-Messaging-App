@@ -104,6 +104,45 @@ var consoleLog = function (...args) {
 	}
 }
 
+const SINGLE_EMOJI_RE = new RegExp(
+	'^(\\p{Extended_Pictographic}(?:\\p{Emoji_Modifier}|\\uFE0F|\\u200D\\p{Extended_Pictographic})*|\\p{Regional_Indicator}{2}|[#*0-9]\\uFE0F?\\u20E3)$', 'u'
+);
+function isSingleEmoji(text) {
+	const t = String(text ?? '').trim().normalize('NFC');
+	return !!t && SINGLE_EMOJI_RE.test(t);
+}
+// Remove trailing "YYYY-MM-DD HH:MM:SS" + optional ms (".633" or "633")
+function stripTrailingTimestamp(str) {
+	if (!str) return str;
+	return str
+		.replace(/\s*\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}(?:[.:]?\d{1,6})?\s*$/, '')
+		.replace(/\uFE0F/g, '') // strip VS16 so 😀 and 😀️ behave the same
+		.trim();
+}
+
+function applySingleEmojiStyling($root = $("#msgs")) {
+	if (!$root.length) return;
+
+	// Try common text containers inside each message bubble
+	const $targets = $root.find(
+		".message-box [data-msg-body],\
+     .message-box .message-body,\
+     .message-box .text,\
+     .message-box .msg,\
+     .message-box .bubble,\
+     .message-box p,\
+     .msg-text"
+	);
+
+	if (!$targets.length) return;
+
+	$targets.each(function () {
+		const textContent = stripTrailingTimestamp($(this).text().trim());
+		$(this).toggleClass("single-emoji", isSingleEmoji(textContent));
+	});
+}
+
+
 var postToServer = async function ($arguments = null) {
 
 	if (typeof $arguments !== "object") {
@@ -297,7 +336,7 @@ var playIncommingMsgSound = async function () {
 }
 
 var loadMsgsFromServerByContactId = async function ($prepend = 0, $contactId = null, $limit = null, $clearChatIfEmpty = 0) {
-	consoleLog("loadMsgsFromServerByContactId fired!");
+	// consoleLog("loadMsgsFromServerByContactId fired!");
 
 	$.globals.isLoadingMsgs = 1;
 	var $contactId = $contactId ?? $.globals.contactId;
@@ -339,9 +378,11 @@ var loadMsgsFromServerByContactId = async function ($prepend = 0, $contactId = n
 				$("#msgs").prepend($html);
 				$("#msgs").find("#load_trigger").remove();
 				$("#msgs").prepend(loadTriggerHtml);
+				applySingleEmojiStyling($("#msgs"));	// Apply single emoji Big styling !!
 			} else {
 				$html = loadTriggerHtml + $html;
 				$("#msgs").html($html);
+				applySingleEmojiStyling($("#msgs"));	// Apply single emoji Big styling !!
 
 				clearInterval($.intervals.chatUpdateInterval);
 
@@ -420,7 +461,7 @@ var getChats = async function ($append = false, $limit = null, $username = null)
 		},
 		"successCallback": function (data) {
 			$chats = data;
-			consoleLog("chats", $chats, { level: 0 });
+			// consoleLog("chats", $chats, { level: 0 });
 			var $i = 0;
 			var $allChatsHtml = "";
 
@@ -549,6 +590,7 @@ var sendTxtMsg = async function ($msg = null, $contactId = null, $username = nul
 	postToServer({
 		"data": postData,
 		"route": "send_wa_txt_msg",
+		"contentType": "application/json; charset=UTF-8",
 		"successCallback": function (data) {
 			$(".send_msg_form").removeClass("disabled");
 			$.globals.isPendingMsg = 0;
@@ -572,7 +614,7 @@ var getProfilePicByContactId = async function ($contactId = null, $username = nu
 	var $contactId = $contactId ?? $.globals.contactId;
 	var $username = $username ?? $.globals.username;
 
-	consoleLog("getProfilePicByContactId fired with $contactId", $contactId, { level: 3 });
+	// consoleLog("getProfilePicByContactId fired with $contactId", $contactId, { level: 3 });
 
 	postToServer({
 		"route": "get_profile_pic_by_contact_id",
@@ -587,7 +629,7 @@ var getProfilePicByContactId = async function ($contactId = null, $username = nu
 				$.globals.thisContact.profile_picture_url = $url;
 				$(".contact_profile_img img[data-contactId='" + $contactId + "']").attr("src", $url);
 
-				consoleLog($(".contact_profile_img img[data-contactId='" + $contactId + "']"), { level: 0 });
+				// consoleLog($(".contact_profile_img img[data-contactId='" + $contactId + "']"), { level: 0 });
 
 				$("img.contact_profile_img[data-contactId='" + $contactId + "']").attr("src", $url);
 				$(".chat[data-contactId='" + $contactId + "'] .contact_profile_img_container img").attr("src", $url);
@@ -604,7 +646,7 @@ var getContactNameById = async function ($contactId = null, $username = null) {
 	var $contactId = $contactId ?? $.globals.contactId;
 	var $username = $username ?? $.globals.username;
 
-	consoleLog("getContactNameById fired with $contactId", $contactId, { level: 3 });
+	// consoleLog("getContactNameById fired with $contactId", $contactId, { level: 3 });
 
 	postToServer({
 		"route": "get_contact_name_by_contact_id",
@@ -651,7 +693,7 @@ var getLastMsgId = function () {
 }
 
 var loadNewMsgs = async function ($contactId = null) {
-	consoleLog("loadNewMsgs fired!");
+	// consoleLog("loadNewMsgs fired!");
 
 	$.globals.isLoadingMsgs = 1;
 	var $contactId = $contactId ?? $.globals.contactId;
@@ -680,6 +722,8 @@ var loadNewMsgs = async function ($contactId = null) {
 			var $html = proccessMsgsArr(data);
 
 			$("#msgs").append($html);
+
+			applySingleEmojiStyling($("#msgs")); 	// Apply single emoji Big styling !!
 
 			$("#msgs audio").each(function () {
 				var $this = $(this);
@@ -826,7 +870,7 @@ $(window).on("load", function () {
 		$(".contact_name_container .contact_name").text($contactName);
 
 		var $contactId = $this.attr("id");
-		consoleLog($contactId, { level: 0 });
+		// consoleLog($contactId, { level: 0 });
 
 		goToChat($contactId);
 	});

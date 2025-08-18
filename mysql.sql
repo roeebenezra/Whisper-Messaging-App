@@ -1,6 +1,7 @@
 /*!40101 SET NAMES utf8mb4 */;
 
-CREATE DATABASE IF NOT EXISTS `local_db`;
+CREATE DATABASE IF NOT EXISTS `local_db`
+  DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 USE `local_db`;
 
@@ -18,7 +19,7 @@ CREATE TABLE `contacts` (
   `contact_name` varchar(255) DEFAULT NULL,
   `profile_picture_url` varchar(255) DEFAULT NULL,
   `creation_datetime` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `contacts` (`row_id`, `contact_id`, `belongs_to_username`, `contact_name`, `profile_picture_url`, `creation_datetime`) VALUES
 (1, 100, 'assaf', 'בן גולדמן', './profile_pics/ben100.jpg', '2025-07-28 19:46:20'),
@@ -51,7 +52,7 @@ CREATE TABLE `messages` (
   `msg_type` varchar(255) DEFAULT NULL,
   `msg_body` longtext,
   `creation_datetime` datetime DEFAULT CURRENT_TIMESTAMP
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `messages` (`row_id`, `belongs_to_username`, `msg_datetime`, `contact_id`, `is_from_me`, `msg_type`, `msg_body`, `creation_datetime`) VALUES
 (1, 'beng', '2025-07-29 22:27:17', '1', 1, 'text', 'אהלן אסף!', '2025-07-29 22:27:17'),

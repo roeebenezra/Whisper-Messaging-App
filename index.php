@@ -15,6 +15,9 @@
 	<link rel="stylesheet" href="./assets/css/mobile.css?v=<?php echo time(); ?>" />
 	<link rel="stylesheet" href="./assets/css/login.css?v=<?php echo time(); ?>" />
 
+	<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+	<script src="/assets/js/emoji_picker_init.js"></script>
+
 	<title>Whisper Messaging App</title>
 </head>
 
