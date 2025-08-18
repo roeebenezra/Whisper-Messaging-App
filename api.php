@@ -6,6 +6,26 @@ define("a328763fe27bba", "TRUE");
 require_once("config.php");
 
 header("Content-Type: application/json; charset=utf-8");
+// --- Auth helper: require token in POST body (x-www-form-urlencoded) ---
+if (!function_exists('require_token_username')) {
+	function require_token_username(): string
+	{
+		$token = $_POST['token'] ?? null;
+		if (!$token || !preg_match('/^[A-Fa-f0-9]{64}$/', $token)) {
+			http_response_code(401);
+			echo json_encode(['ok' => false, 'error' => 'missing/invalid token']);
+			die();
+		}
+		$rows = mysql_fetch_array("SELECT username FROM auth_tokens WHERE token=? AND expires_at>=NOW() LIMIT 1", [$token]);
+		if (!$rows) {
+			http_response_code(401);
+			echo json_encode(['ok' => false, 'error' => 'token expired/invalid']);
+			die();
+		}
+		return $rows[0]['username'];
+	}
+}
+
 
 $data = $_GET["data"] ?? null;
 $globals["_GET_DATA"] = $data;
@@ -15,9 +35,9 @@ $globals["_GET_DATA"] = $data;
 switch ($data) {
 
 	case "get_chats":
-		header('Content-Type: application/json; charset=utf-8');
+		// header('Content-Type: application/json; charset=utf-8');
 
-		$username = $_POST['username'] ?? null;
+		$username = require_token_username();
 		if (!$username) {
 			error_log("ERROR 547389478934729837493287649827634");
 			echo json_encode(['ok' => false, 'error' => 'missing username'], JSON_UNESCAPED_UNICODE);
@@ -26,7 +46,10 @@ switch ($data) {
 
 		// sanitize limit (cap to something sensible)
 		$limit = isset($_POST['limit']) ? (int) $_POST['limit'] : 6;
-		$limit = max(1, min($limit, 50));
+		if ($limit < 1)
+			$limit = 1;
+		if ($limit > 50)
+			$limit = 50;
 
 		// $pdo should be your PDO instance (mysql: host/db set, ERRMODE_EXCEPTION, etc.)
 		$sql = "
@@ -60,7 +83,7 @@ switch ($data) {
 	case "get_msgs":
 		#region get_msgs
 
-		$username = $_POST["username"] ?? null;
+		$username = require_token_username();
 		$contact_id = $_POST["contact_id"] ?? null;
 
 		if (!$username) {
@@ -94,7 +117,7 @@ switch ($data) {
 	case "get_new_msgs":
 		#region get_msgs
 
-		$username = $_POST["username"] ?? null;
+		$username = require_token_username();
 		$contact_id = $_POST["contact_id"] ?? null;
 		$last_id = ((int) $_POST["last_id"]) ?? null;
 
@@ -129,7 +152,7 @@ switch ($data) {
 	case "get_contact_name_by_contact_id":
 		#region get_contact_name_by_contact_id
 
-		$username = $_POST["username"] ?? null;
+		$username = require_token_username();
 		$contact_id = $_POST["contact_id"] ?? null;
 
 		if (!$username) {
@@ -155,7 +178,7 @@ switch ($data) {
 	case "get_profile_pic_by_contact_id":
 		#region get_profile_pic_by_contact_id
 
-		$username = $_POST["username"] ?? null;
+		$username = require_token_username();
 		$contact_id = $_POST["contact_id"] ?? null;
 
 		if (!$username) {
@@ -183,7 +206,7 @@ switch ($data) {
 
 		$msg = $_POST["msg"] ?? null;
 		$contact_id = $_POST["contact_id"] ?? null;
-		$username = $_POST["username"] ?? null;
+		$username = require_token_username();
 
 		if (!$msg) {
 			error_log("ERROR 34097329087643298674938647892367364647");

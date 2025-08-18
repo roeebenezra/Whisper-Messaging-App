@@ -675,3 +675,58 @@ ALTER TABLE `messages`
 ALTER TABLE `users`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=115;
 COMMIT;
+
+
+/* === Auth & Login Additions (merged) ======================================
+   - Make `users` table FK-targetable (InnoDB + NOT NULL + UNIQUE username)
+   - Create `auth_otps` and `auth_tokens` with FKs to users(username)
+   - Order is important: alter users first, then create child tables.
+============================================================================ */
+
+START TRANSACTION;
+
+-- Standardize `users` so it can be referenced by foreign keys
+ALTER TABLE `users`
+  ENGINE=InnoDB,
+  CONVERT TO CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci,
+  MODIFY `username` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL;
+
+-- Ensure uniqueness for FK target (keep existing PK on `id`)
+ALTER TABLE `users`
+  ADD UNIQUE KEY `uq_users_username` (`username`);
+
+-- Add email column
+ALTER TABLE `users` ADD COLUMN email VARCHAR(255) NULL AFTER username;
+
+-- OTP sends table
+CREATE TABLE IF NOT EXISTS `auth_otps` (
+  `id` INT AUTO_INCREMENT PRIMARY KEY,
+  `username` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `otp_hash` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `sent_at` DATETIME NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  `used_at` DATETIME NULL,
+  `ip` VARCHAR(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  `user_agent` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NULL,
+  INDEX `ix_user_time` (`username`, `sent_at`),
+  CONSTRAINT `fk_auth_otps_user`
+    FOREIGN KEY (`username`) REFERENCES `users`(`username`)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Login tokens table (opaque 64-hex token, stored as CHAR(64))
+CREATE TABLE IF NOT EXISTS `auth_tokens` (
+  `token` CHAR(64) CHARACTER SET ascii COLLATE ascii_general_ci PRIMARY KEY,
+  `username` VARCHAR(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL,
+  `created_at` DATETIME NOT NULL,
+  `expires_at` DATETIME NOT NULL,
+  CONSTRAINT `fk_auth_tokens_user`
+    FOREIGN KEY (`username`) REFERENCES `users`(`username`)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+COMMIT;
+
+-- Add indexes for performance
+ALTER TABLE auth_tokens ADD INDEX ix_token_exp (token, expires_at);
+ALTER TABLE auth_otps   ADD INDEX ix_user_active (username, expires_at, used_at);
