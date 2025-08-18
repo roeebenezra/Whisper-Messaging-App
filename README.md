@@ -44,4 +44,4 @@ Implements login with OTP (via Brevo API), sending messages (text, image, audio,
 1. Clone repository.
 2. Import the database schema:
    ```bash
-   mysql -u root -p whisper_db < mysql.sql
+   mysql -u root -p local_db < mysql.sql
