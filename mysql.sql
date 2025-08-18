@@ -51,7 +51,8 @@ CREATE TABLE `messages` (
   `is_from_me` tinyint(1) DEFAULT '1',
   `msg_type` varchar(255) DEFAULT NULL,
   `msg_body` longtext,
-  `creation_datetime` datetime DEFAULT CURRENT_TIMESTAMP
+  `creation_datetime` datetime DEFAULT CURRENT_TIMESTAMP,
+  `is_deleted` TINYINT(1) DEFAULT 0
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8mb4;
 
 INSERT INTO `messages` (`row_id`, `belongs_to_username`, `msg_datetime`, `contact_id`, `is_from_me`, `msg_type`, `msg_body`, `creation_datetime`) VALUES

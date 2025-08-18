@@ -203,10 +203,9 @@ switch ($data) {
 
 	case "send_wa_txt_msg":
 		#region send_wa_txt_msg
-
+		$username = require_token_username();
 		$msg = $_POST["msg"] ?? null;
 		$contact_id = $_POST["contact_id"] ?? null;
-		$username = require_token_username();
 
 		if (!$msg) {
 			error_log("ERROR 34097329087643298674938647892367364647");
@@ -271,8 +270,28 @@ switch ($data) {
 
 		#endregion send_wa_txt_msg
 		break;
+
+	// ✅ New delete_msg route
+	case "delete_msg":
+		require_token_username();
+		$msg_id = intval($_POST['msg_id'] ?? 0);
+
+		$stmt = $mysqli->prepare("UPDATE messages 
+                                  SET msg_type='revoked', msg_body=NULL 
+                                  WHERE row_id=?");
+
+		$stmt->bind_param("i", $msg_id);
+		$ok = $stmt->execute();
+		$stmt->close();
+		exit;
+
+	# endregion delete_msg
+
+	default:
+		echo json_encode(["success" => false, "error" => "Unknown route", "route" => $route]);
+		exit;
+
 }
 
 include_all_plugins("api.php");
 die();
-?>

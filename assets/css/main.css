@@ -690,3 +690,19 @@ video {
 .message-box p.single-emoji > br {
   display: none;
 }
+
+.message-box .delete-msg {
+  font-size: 0.7rem;
+  margin-left: 5px;
+  cursor: pointer;
+  color: #888;
+}
+
+.message-box .delete-msg:hover {
+  color: red;
+}
+
+.message-box .deleted-text {
+  font-style: italic;
+  color: #777;
+}
