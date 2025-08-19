@@ -276,15 +276,16 @@ switch ($data) {
 		require_token_username();
 		$msg_id = intval($_POST['msg_id'] ?? 0);
 
-		$stmt = $mysqli->prepare("UPDATE messages 
-                                  SET msg_type='revoked', msg_body=NULL 
-                                  WHERE row_id=?");
+		$query = "UPDATE messages SET msg_type='revoked', msg_body=NULL WHERE row_id=?";
+		$params = [$msg_id];
+		$conn = mysql_prepared_execute($query, $params);
+		if ($conn["success"]) {
+			echo json_encode(["success" => true]);
+			exit;
+		}
 
-		$stmt->bind_param("i", $msg_id);
-		$ok = $stmt->execute();
-		$stmt->close();
-		exit;
-
+		echo json_encode(false);
+		break;
 	# endregion delete_msg
 
 	default:

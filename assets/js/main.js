@@ -495,7 +495,7 @@ var getMoreChats = async function () {
 }
 
 var refreshApp = async function () {
-	$.globlas.username = localStorage.getItem("username");
+	$.globals.username = localStorage.getItem("username");
 	updateBotsList();
 	getChats();
 }
@@ -906,18 +906,21 @@ $(window).on("load", function () {
 
 		postToServer({
 			"route": "delete_msg",
-			"method": "UPDATE",
 			"data": {
 				"msg_id": msgId,
 				"username": $.globals.username
 			}, "successCallback": function (res) {
-				
+				if (!res || !res.success) {
+					consoleLog("Failed to delete message", res, { level: 3, type: "error" });
+					return;
+				}
 				if (res.success) {
 					const $msgEl = $("#msg_id_" + msgId + " .content");
 					$msgEl.find(".msg_id").remove(); // keep hidden id clean
 					$msgEl.html("הודעה זו נמחקה<br><span class='datetime'>" + new Date().toLocaleTimeString() + "</span>")
 						.addClass("deleted-text");
 					$("#msg_id_" + msgId + " .delete-msg").remove();
+					consoleLog("Message deleted");
 				}
 			}
 		});
