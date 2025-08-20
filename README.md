@@ -17,19 +17,6 @@ Implements login with OTP (via Brevo API), sending messages (text, image, audio,
 
 ---
 
-## Known Issues
-
-- **Delete Message:**  
-  The `delete_msg` route exists in `api.php`, but the functionality is not working correctly.  
-  The SQL `UPDATE` runs with `row_id=?` but no rows are affected. Possible causes:
-  - Missing `username` or sender check in the `messages` table schema.
-  - `require_token_username()` may reject the request if the token/username doesn’t pass validation.
-  - The current query doesn’t restrict deletion to the original sender.
-
-  ⚠️ Until fixed, attempting to delete a message will return no error but will not update the database.
-
----
-
 ## Requirements
 
 - PHP 8.x
